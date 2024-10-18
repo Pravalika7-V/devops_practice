@@ -19,7 +19,8 @@ pipeline {
             steps {
                 script {
                     // Build the Docker image using the Dockerfile in the repo
-                    sh 'docker build -t ${DOCKER_IMAGE}:latest .'
+                    // Adjusted for Windows environment
+                    bat 'docker build -t ${DOCKER_IMAGE}:latest .'
                 }
             }
         }
@@ -28,7 +29,8 @@ pipeline {
             steps {
                 script {
                     // Tag the Docker image for Docker Hub
-                    sh 'docker tag ${DOCKER_IMAGE}:latest ${DOCKER_HUB_REPO}:${DOCKER_IMAGE}:latest'
+                    // Adjusted for Windows environment
+                    bat 'docker tag ${DOCKER_IMAGE}:latest ${DOCKER_HUB_REPO}:${DOCKER_IMAGE}:latest'
                 }
             }
         }
@@ -38,7 +40,7 @@ pipeline {
                 script {
                     // Login to Docker Hub using credentials stored in Jenkins
                     withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh "echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin"
+                        bat "echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin"
                     }
                 }
             }
@@ -48,7 +50,8 @@ pipeline {
             steps {
                 script {
                     // Push the Docker image to Docker Hub
-                    sh 'docker push ${DOCKER_HUB_REPO}:${DOCKER_IMAGE}:latest'
+                    // Adjusted for Windows environment
+                    bat 'docker push ${DOCKER_HUB_REPO}:${DOCKER_IMAGE}:latest'
                 }
             }
         }
@@ -57,7 +60,8 @@ pipeline {
             steps {
                 script {
                     // Remove local Docker images to free up space
-                    sh 'docker rmi ${DOCKER_HUB_REPO}:${DOCKER_IMAGE}:latest'
+                    // Adjusted for Windows environment
+                    bat 'docker rmi ${DOCKER_HUB_REPO}:${DOCKER_IMAGE}:latest'
                 }
             }
         }
