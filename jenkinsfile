@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         DOCKER_HUB_REPO = 'pravalika7/devops_practice'  // Docker Hub repo
-        DOCKER_IMAGE = 'devops_image'                  // Docker image name
-        DOCKER_CREDENTIALS_ID = 'pravalika7-docker'    // Credentials ID for Docker Hub
+        DOCKER_IMAGE = 'devops_image'                   // Docker image name
+        DOCKER_CREDENTIALS_ID = 'jenkinstoken'          // Updated Credentials ID for Docker Hub
     }
 
     stages {
@@ -35,7 +35,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    bat "docker build -t %DOCKER_IMAGE%:latest ."
+                    bat "docker build -t ${DOCKER_IMAGE}:latest ."
                 }
             }
         }
@@ -43,7 +43,7 @@ pipeline {
         stage('Tag Docker Image') {
             steps {
                 script {
-                    bat "docker tag %DOCKER_IMAGE%:latest %DOCKER_HUB_REPO%:%DOCKER_IMAGE%:latest"
+                    bat "docker tag ${DOCKER_IMAGE}:latest ${DOCKER_HUB_REPO}:${DOCKER_IMAGE}:latest"
                 }
             }
         }
@@ -61,7 +61,7 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    bat "docker push %DOCKER_HUB_REPO%:%DOCKER_IMAGE%:latest"
+                    bat "docker push ${DOCKER_HUB_REPO}:${DOCKER_IMAGE}:latest"
                 }
             }
         }
@@ -69,7 +69,7 @@ pipeline {
         stage('Cleanup Docker Images') {
             steps {
                 script {
-                    bat "docker rmi %DOCKER_HUB_REPO%:%DOCKER_IMAGE%:latest"
+                    bat "docker rmi ${DOCKER_HUB_REPO}:${DOCKER_IMAGE}:latest"
                 }
             }
         }
