@@ -5,7 +5,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // Clone the repository
-                git 'https://github.com/your-username/simple-node-server.git'
+                git 'https://github.com/Pravalika7-V/devops_practice.git'
             }
         }
         stage('Install Dependencies') {
