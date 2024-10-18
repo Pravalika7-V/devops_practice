@@ -43,7 +43,8 @@ pipeline {
         stage('Tag Docker Image') {
             steps {
                 script {
-                    bat "docker tag ${DOCKER_IMAGE}:latest ${DOCKER_HUB_REPO}:${DOCKER_IMAGE}:latest"
+                    // Correcting the tag format here
+                    bat "docker tag ${DOCKER_IMAGE}:latest ${DOCKER_HUB_REPO}:latest"
                 }
             }
         }
@@ -61,7 +62,7 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    bat "docker push ${DOCKER_HUB_REPO}:${DOCKER_IMAGE}:latest"
+                    bat "docker push ${DOCKER_HUB_REPO}:latest"
                 }
             }
         }
@@ -69,7 +70,7 @@ pipeline {
         stage('Cleanup Docker Images') {
             steps {
                 script {
-                    bat "docker rmi ${DOCKER_HUB_REPO}:${DOCKER_IMAGE}:latest"
+                    bat "docker rmi ${DOCKER_HUB_REPO}:latest"
                 }
             }
         }
