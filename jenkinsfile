@@ -49,19 +49,21 @@ pipeline {
             }
         }
 
+        
         // stage('Login to Docker Hub') {
         //     steps {
-        //         script {
-        //             withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-        //                 bat "echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin"
-        //             }
+        //         withCredentials([usernamePassword(credentialsId: 'jenkinstoken', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+        //             bat "echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin"
         //         }
         //     }
         // }
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'jenkinstoken', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-                    bat "echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin"
+                    bat """
+                        @echo off
+                        echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin
+                    """
                 }
             }
         }
