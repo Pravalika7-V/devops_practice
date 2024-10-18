@@ -58,15 +58,16 @@ pipeline {
         //     }
         // }
         stage('Login to Docker Hub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'jenkinstoken', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-                    bat """
-                        @echo off
-                        echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin
-                    """
-                }
-            }
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'jenkinstoken', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+            bat """
+                @echo off
+                echo %PASSWORD% | docker login -u %USERNAME% --password-stdin
+            """
         }
+    }
+}
+
 
         stage('Push to Docker Hub') {
             steps {
