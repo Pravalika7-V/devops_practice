@@ -1,39 +1,77 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_HUB_REPO = 'pravalika7/devops_practice'  // Docker Hub repo
+        DOCKER_IMAGE = 'image'                        // Docker image name
+        DOCKER_CREDENTIALS_ID = 'pravalika7-docker'               // Credentials ID created earlier
+        DOCKER_DESKTOP_REPO = 'image'          // Local Docker repo name for Docker Desktop
+    }
+
     stages {
         stage('Clone Repository') {
             steps {
-                // Clone the repository
-                git 'https://github.com/Pravalika7-V/devops_practice.git'
+                // Clone your repository from Git
+                git url: 'https://github.com/Pravalika7-V/devops_practice.git', branch: 'main'
             }
         }
-        stage('Install Dependencies') {
-            steps {
-                // Install Node.js dependencies
-                sh 'npm install'
-            }
-        }
-        stage('Run Tests') {
-            steps {
-                // Run tests (you can replace this with your test command)
-                sh 'echo "No tests to run."'
-            }
-        }
-        stage('Build') {
-            steps {
-                // Add build commands here if needed
-                sh 'echo "Building the application..."'
-            }
-        }
-    }
 
-    post {
-        success {
-            echo 'Pipeline completed successfully!'
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build the Docker image using the Dockerfile in the repo
+                    sh 'docker build -t ${DOCKER_IMAGE}:latest .'
+                }
+            }
         }
-        failure {
-            echo 'Pipeline failed.'
+
+        stage('Tag Docker Image') {
+            steps {
+                script {
+                    // Tag the Docker image for Docker Desktop and Docker Hub
+                    sh 'docker tag ${DOCKER_IMAGE}:latest ${DOCKER_DESKTOP_REPO}:${DOCKER_IMAGE}-latest'
+                    sh 'docker tag ${DOCKER_IMAGE}:latest ${DOCKER_HUB_REPO}:${DOCKER_IMAGE}-latest'
+                }
+            }
+        }
+
+        stage('Push to Docker Desktop') {
+            steps {
+                script {
+                    // Push the image to local Docker Desktop
+                    sh 'docker push ${DOCKER_DESKTOP_REPO}:${DOCKER_IMAGE}-latest'
+                }
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                script {
+                    // Login to Docker Hub using credentials stored in Jenkins
+                    withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh "echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin"
+                    }
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    // Push the Docker image to Docker Hub
+                    sh 'docker push ${DOCKER_HUB_REPO}:${DOCKER_IMAGE}-latest'
+                }
+            }
+        }
+
+        stage('Cleanup Docker Images') {
+            steps {
+                script {
+                    // Remove local Docker images to free up space
+                    sh 'docker rmi ${DOCKER_DESKTOP_REPO}:${DOCKER_IMAGE}-latest'
+                    sh 'docker rmi ${DOCKER_HUB_REPO}:${DOCKER_IMAGE}-latest'
+                }
+            }
         }
     }
 }
