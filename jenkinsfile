@@ -6,7 +6,7 @@ pipeline {
         DOCKER_IMAGE = 'devops_image'                   // Docker image name
         DOCKER_CREDENTIALS_ID = 'jenkinstoken'          // Updated Credentials ID for Docker Hub
     }
-
+    
     stages {
         stage('Clone Repository') {
             steps {
@@ -57,17 +57,28 @@ pipeline {
         //         }
         //     }
         // }
-        stage('Login to Docker Hub') {
-    steps {
-        withCredentials([usernamePassword(credentialsId: 'token', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-            bat """
-                @echo off
-                echo %PASSWORD% | docker login -u %USERNAME% --password-stdin
-            """
-        }
-    }
-}
+//         stage('Login to Docker Hub') {
+//     steps {
+//         withCredentials([usernamePassword(credentialsId: 'token', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+//             bat """
+//                 @echo off
+//                 echo %PASSWORD% | docker login -u %USERNAME% --password-stdin
+//             """
+//         }
+//     }
+// }
+ stage('Login to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'token', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    // Print Docker credentials for debugging (remove in production)
+                    echo "Docker Username: ${DOCKER_USERNAME}"
+                    echo "Docker Password: ${DOCKER_PASSWORD}"  // Be cautious with logging sensitive info!
 
+                    // Attempt to log in
+                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD'
+                }
+            }
+        }
 
         stage('Push to Docker Hub') {
             steps {
